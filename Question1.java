@@ -7,9 +7,9 @@ import java.util.stream.*;
 public class Question1 {
 
     static int LOW = 0,
-               HIGH = 4999,
-               REQUESTS = 1000,
-               INF = Integer.MAX_VALUE;
+    HIGH = 4999,
+    REQUESTS = 1000,
+    INF = Integer.MAX_VALUE;
 
     public static void main(String arg[]) {
 
@@ -19,8 +19,8 @@ public class Question1 {
         // Generate random requests
         Random rand = new Random();
         IntStream randInts = rand.ints(LOW, HIGH + 1).distinct().limit(REQUESTS);
-        ArrayList<Integer> queue = new ArrayList<Integer>(
-            randInts.boxed().collect(Collectors.toList()));
+        ArrayList<Integer> queue =
+            new ArrayList<Integer>(randInts.boxed().collect(Collectors.toList()));
 
         fcfs(queue, initPos);
         sstf(queue, initPos);
@@ -37,8 +37,8 @@ public class Question1 {
     public static void fcfs(ArrayList<Integer> queue, int initPos) {
 
         int prevPos = initPos,
-            currPos,
-            headMvmt = 0;
+        currPos,
+        headMvmt = 0;
 
         // Go through the queue in order
         for (int i = 0; i < REQUESTS; i++) {
@@ -58,13 +58,13 @@ public class Question1 {
         queue.sort(null);
 
         int leftIdx,
-            rightIdx = 0,
-            currPos = initPos,
-            leftReq = LOW,
-            rightReq = HIGH,
-            leftDist,
-            rightDist,
-            headMvmt = 0;
+        rightIdx = 0,
+        currPos = initPos,
+        leftReq = LOW,
+        rightReq = HIGH,
+        leftDist,
+        rightDist,
+        headMvmt = 0;
 
         // Get the indexes of the requests to the right and left of the initial position
         while (rightIdx < REQUESTS && queue.get(rightIdx) < initPos) {
@@ -114,9 +114,9 @@ public class Question1 {
         queue.sort(null);
 
         int rightIdx = 0,
-            firstReq = queue.get(0),
-            lastReq = queue.get(REQUESTS - 1),
-            headMvmt = 0;
+        firstReq = queue.get(0),
+        lastReq = queue.get(REQUESTS - 1),
+        headMvmt = 0;
 
         // Get the index of the request to the right of initial position
         while (rightIdx < REQUESTS && queue.get(rightIdx) < initPos) {
@@ -148,7 +148,7 @@ public class Question1 {
         queue.sort(null);
 
         int rightIdx = 0,
-            headMvmt = 0;
+        headMvmt = 0;
 
         // Get the index of the request to the right of initial position
         while (rightIdx < REQUESTS && queue.get(rightIdx) < initPos) {
@@ -180,9 +180,9 @@ public class Question1 {
         queue.sort(null);
 
         int rightIdx = 0,
-            firstReq = queue.get(0),
-            lastReq = queue.get(REQUESTS - 1),
-            headMvmt = 0;
+        firstReq = queue.get(0),
+        lastReq = queue.get(REQUESTS - 1),
+        headMvmt = 0;
 
         // Get the index of the request to the right of initial position
         while (rightIdx < REQUESTS && queue.get(rightIdx) < initPos) {
@@ -214,9 +214,9 @@ public class Question1 {
         queue.sort(null);
 
         int rightIdx = 0,
-            firstReq = queue.get(0),
-            lastReq = queue.get(REQUESTS - 1),
-            headMvmt = 0;
+        firstReq = queue.get(0),
+        lastReq = queue.get(REQUESTS - 1),
+        headMvmt = 0;
 
         // Get the index of the request to the right of initial position
         while (rightIdx < REQUESTS && queue.get(rightIdx) < initPos) {
@@ -241,4 +241,3 @@ public class Question1 {
         System.out.println("C-LOOK: " + headMvmt + " cylinders.");
     }
 }
-
