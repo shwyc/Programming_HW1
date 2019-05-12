@@ -7,9 +7,9 @@ import java.util.stream.*;
 public class Question1 {
 
     static int LOW = 0,
-    HIGH = 4999,
-    REQUESTS = 1000,
-    INF = Integer.MAX_VALUE;
+               HIGH = 4999,
+               REQUESTS = 1000,
+               INF = Integer.MAX_VALUE;
 
     public static void main(String arg[]) {
 
