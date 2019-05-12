@@ -1,25 +1,33 @@
+// J.P. O'Malley
+
 import java.util.*;
 import java.lang.*;
+import java.util.stream.*;
 
 public class Question1 {
 
     static int LOW = 0,
-               HIGH = 199, // 4999 for the homework
-               REQUESTS = 8, // 1000 for the homework
+               HIGH = 4999,
+               REQUESTS = 1000,
                INF = Integer.MAX_VALUE;
 
     public static void main(String arg[]) {
 
-        int initPos = 53; // arg[1] for homework
+        // Get initial position
+        int initPos = new Integer(arg[0]);
+
+        // Generate random requests
+        Random rand = new Random();
+        IntStream randInts = rand.ints(LOW, HIGH + 1).distinct().limit(REQUESTS);
         ArrayList<Integer> queue = new ArrayList<Integer>(
-            Arrays.asList(98, 183, 37, 122, 14, 124, 65, 67)); // Randomly generated for homework
+            randInts.boxed().collect(Collectors.toList()));
 
         fcfs(queue, initPos);
         sstf(queue, initPos);
-        // scan(queue, initPos);
-        // cscan(queue, initPos);
-        // look(queue, initPos);
-        // clook(queue, initPos);
+        scan(queue, initPos);
+        cscan(queue, initPos);
+        look(queue, initPos);
+        clook(queue, initPos);
     }
 
 
@@ -58,15 +66,15 @@ public class Question1 {
             rightDist,
             headMvmt = 0;
 
+        // Get the indexes of the requests to the right and left of the initial position
         while (rightIdx < REQUESTS && queue.get(rightIdx) < initPos) {
             rightIdx++;
         }
         leftIdx = rightIdx - 1;
 
-        System.out.println(currPos);
         for (int n = 0; n < REQUESTS; n++) {
 
-            // Calculate distances to requests
+            // Calculate distances to both requests
             if (leftIdx >= 0) {
                 leftReq = queue.get(leftIdx);
                 leftDist = currPos - leftReq;
@@ -83,9 +91,6 @@ public class Question1 {
                 rightDist = INF;
             }
 
-            System.out.println("leftReq: " + leftReq);
-            System.out.println("rightReq: " + rightReq);
-
             // Go to the closer request
             if (leftDist <= rightDist) {
                 currPos = leftReq;
@@ -97,7 +102,6 @@ public class Question1 {
                 rightIdx += 1;
                 headMvmt += rightDist;
             }
-            System.out.println(currPos);
         }
 
         System.out.println("SSTF: " + headMvmt + " cylinders.");
@@ -106,42 +110,35 @@ public class Question1 {
     // SCAN
     public static void scan(ArrayList<Integer> queue, int initPos) {
 
-        // queue = new ArrayList<Integer>(queue);
-        // queue.add(initPos);
-        // int firstCyl = 3;
-        // boolean goingUp = initPos < (HIGH - LOW) / 2;
+        queue = new ArrayList<Integer>(queue);
+        queue.sort(null);
 
+        int rightIdx = 0,
+            firstReq = queue.get(0),
+            lastReq = queue.get(REQUESTS - 1),
+            headMvmt = 0;
 
+        // Get the index of the request to the right of initial position
+        while (rightIdx < REQUESTS && queue.get(rightIdx) < initPos) {
+            rightIdx++;
+        }
 
-        // queue = new ArrayList<Integer>(queue);
-        // queue.add(initPos);
+        if (rightIdx == 0) { // If all the requests are to the right
+            headMvmt += lastReq - initPos;
+        }
+        else if (rightIdx == REQUESTS) { // If all the requests are to the left
+            headMvmt += initPos - firstReq;
+        }
+        else if (rightIdx > (HIGH - LOW) / 2) { // If right end is closer
+            headMvmt += HIGH - initPos; // To the rightmost cylinder
+            headMvmt += HIGH - firstReq; // To the leftmost request
+        }
+        else { // If left end is closer
+            headMvmt += initPos - LOW; // To the leftmost cylinder
+            headMvmt += lastReq - LOW; // To the rightmost request
+        }
 
-        // boolean downFirst = initPos < (HIGH - LOW) / 2;
-        // if (downFirst) {
-        //     queue.add(LOW);
-        // }
-        // else {
-        //     queue.add(HIGH);
-        // }
-
-        // queue.sort(null);
-
-
-        // // Figure out the order
-        // int initI = queue.indexOf(initPos);
-        // ArrayList<Integer> lowerPoses = new ArrayList<Integer>(queue.subList(0, initI));
-        // removeArrRange(queue, 0, initI);
-        // reverseArr(lowerPoses);
-        // if (downFirst) {
-        //     queue.addAll(1, lowerPoses);
-        // }
-        // else {
-        //     queue.addAll(lowerPoses);
-        // }
-
-        // System.out.println("SCAN");
-        // printArr(queue);
-        // System.out.println(calcHeadMvmt(queue));
+        System.out.println("SCAN: " + headMvmt + " cylinders.");
     }
 
     // C-SCAN
@@ -150,69 +147,98 @@ public class Question1 {
         queue = new ArrayList<Integer>(queue);
         queue.sort(null);
 
-        int initIdx = 0,
-            currPos = initPos,
-            nextReq,
+        int rightIdx = 0,
             headMvmt = 0;
 
-        while (initIdx < REQUESTS && queue.get(initIdx) < initPos) {
-            init++;
+        // Get the index of the request to the right of initial position
+        while (rightIdx < REQUESTS && queue.get(rightIdx) < initPos) {
+            rightIdx++;
         }
 
-        for (int i = initIdx; initIdx < REQUESTS; i++) {
-            nextReq = queue.get(i);
-            headMvmt;
+        if (rightIdx == 0) { // If all the requests are to the right
+            headMvmt += queue.get(REQUESTS - 1) - initPos;
         }
+        else if (rightIdx == REQUESTS) { // If all the requests are to the left
+            headMvmt += initPos - queue.get(0);
+        }
+        else if (rightIdx > (HIGH - LOW) / 2) { // If right end is closer
+            headMvmt += HIGH - initPos; // To the right end
+            headMvmt += queue.get(rightIdx - 1) - LOW; // From the left end to the request left of the initial postion
+        }
+        else { // If left end is closer
+            headMvmt += initPos - LOW; // To the left end
+            headMvmt += HIGH - queue.get(rightIdx); // From the right end to the request right of the initial postion
+        }
+
+        System.out.println("C-SCAN: " + headMvmt + " cylinders.");
     }
 
+    // LOOK
+    public static void look(ArrayList<Integer> queue, int initPos) {
 
-    // Methods
+        queue = new ArrayList<Integer>(queue);
+        queue.sort(null);
 
-    // Calculating total head movement
-    public static int calcHeadMvmt(ArrayList<Integer> positions) {
-        int total = 0,
-        arrSize = positions.size(),
-        a,
-        b = positions.get(0);
-        for (int i = 0; i < arrSize - 1; i++) {
-            a = b;
-            b = positions.get(i + 1);
+        int rightIdx = 0,
+            firstReq = queue.get(0),
+            lastReq = queue.get(REQUESTS - 1),
+            headMvmt = 0;
 
-            if (!((a == LOW && b == HIGH) || (a == HIGH && b == LOW)))
-                total += Math.abs(b - a);
+        // Get the index of the request to the right of initial position
+        while (rightIdx < REQUESTS && queue.get(rightIdx) < initPos) {
+            rightIdx++;
         }
 
-        return total;
+        if (rightIdx == 0) { // If all the requests are to the right
+            headMvmt += lastReq - initPos;
+        }
+        else if (rightIdx == REQUESTS) { // If all the requests are to the left
+            headMvmt += initPos - firstReq;
+        }
+        else if (rightIdx > (HIGH - LOW) / 2) { // If right end is closer
+            headMvmt += lastReq - initPos; // To the rightmost request
+            headMvmt += lastReq - firstReq; // To the leftmost request
+        }
+        else { // If left end is closer
+            headMvmt += initPos - firstReq; // To the leftmost request
+            headMvmt += lastReq - firstReq; // To the rightmost request
+        }
+
+        System.out.println("LOOK: " + headMvmt + " cylinders.");
     }
 
-    // Print array
-    public static void printArr(ArrayList<Integer> arr) {
-        int arrSize = arr.size();
-        for (int i = 0; i < arrSize - 1; i++) {
-            System.out.print(arr.get(i));
-            System.out.print(", ");
-        }
-        System.out.println(arr.get(arrSize - 1));
-    }
+    // C-LOOK
+    public static void clook(ArrayList<Integer> queue, int initPos) {
 
-    // Remove array range
-    public static void removeArrRange(ArrayList<Integer> arr, int fromIndex, int toIndex) {
-        int rangeLen = toIndex - fromIndex;
-        for (int i = 0; i < rangeLen; i++) {
-            arr.remove(fromIndex);
-        }
-    }
+        queue = new ArrayList<Integer>(queue);
+        queue.sort(null);
 
-    // Reverse array
-    public static void reverseArr(ArrayList<Integer> arr) {
-        int arrSize = arr.size(),
-        halfPoint = arrSize / 2;
-        for (int i = 0; i < halfPoint; i++) {
-            int a = arr.get(i),
-            b = arr.get(arrSize - 1 - i);
+        int rightIdx = 0,
+            firstReq = queue.get(0),
+            lastReq = queue.get(REQUESTS - 1),
+            headMvmt = 0;
 
-            arr.set(i, b);
-            arr.set(arrSize - 1 - i, a);
+        // Get the index of the request to the right of initial position
+        while (rightIdx < REQUESTS && queue.get(rightIdx) < initPos) {
+            rightIdx++;
         }
+
+        if (rightIdx == 0) { // If all the requests are to the right
+            headMvmt += lastReq - initPos;
+        }
+        else if (rightIdx == REQUESTS) { // If all the requests are to the left
+            headMvmt += initPos - firstReq;
+        }
+        else if (rightIdx > (HIGH - LOW) / 2) { // If right end is closer
+            headMvmt += lastReq - initPos; // To the rightmost request
+            headMvmt += queue.get(rightIdx - 1) - firstReq; // From the leftmost request to the request left of the initial position
+        }
+        else { // If left end is closer
+            headMvmt += initPos - firstReq; // To the leftmost request
+            headMvmt += lastReq - queue.get(rightIdx); // From the rightmost request to the request right of the initial position
+        }
+
+        System.out.println("C-LOOK: " + headMvmt + " cylinders.");
     }
 }
+
